@@ -18,3 +18,11 @@ Contains resources or solutions to various hacking challenges.
     * [Overthewire - Narnia](https://overthewire.org/wargames/narnia/) 
 	* [pwnable.kr](https://pwnable.kr/play.php)
 	* [pwnable.tw](https://pwnable.tw/challenge/)
+
+# Install pwntools
+Tested on WSL1 Ubuntu 20.04:
+
+```
+sudo apt-get install python3 python3-pip python3-dev git libssl-dev libffi-dev build-essential binutils-*-linux-gnu
+sudo pip3 install pwntools
+```
