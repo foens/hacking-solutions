@@ -1,0 +1,2 @@
+# Write the text /flag to the program in binary
+python -c "print ''.join('{0:08b}'.format(ord(x), 'b') for x in '/flag')" | nc ctf2016.the-playground.dk 13001
