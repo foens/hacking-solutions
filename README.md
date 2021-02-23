@@ -3,6 +3,7 @@ Contains resources or solutions to various hacking challenges.
 
 # Resources
 * [pwntools](https://github.com/Gallopsled/pwntools)
+* [Ghidra](https://ghidra-sre.org/)
 * Prosa Hacking Workshop for Noobs
     *  [Youtube vidoes](https://www.youtube.com/channel/UCkrcc5UJDJdHwzRMxZgU0QQ/videos?view=0&shelf_id=0&sort=dd)
     *  [workshop vm](https://github.com/RobertLarsen/ProsaWorkshop)
@@ -18,6 +19,9 @@ Contains resources or solutions to various hacking challenges.
     * [Overthewire - Narnia](https://overthewire.org/wargames/narnia/) 
 	* [pwnable.kr](https://pwnable.kr/play.php)
 	* [pwnable.tw](https://pwnable.tw/challenge/)
+	* [RingZer0 Team Online CTF](https://ringzer0ctf.com/challenges)
+	* [Hacker Gateway](https://www.hackergateway.com/challenges)
+	* [HackTheBox](https://www.hackthebox.eu/)
 
 # Install pwntools
 Tested on WSL1 Ubuntu 20.04:
