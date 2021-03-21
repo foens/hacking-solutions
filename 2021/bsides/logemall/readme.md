@@ -20,7 +20,7 @@ Walking to the professor gives the task:
 Asciimon found in the wild. Well, some are in the wild. I'm not sure
 where you'll find the others. But I'm sure you can do it!
 
-So we need to log all Asciimons. He also its that not all may exist.
+So we need to log all Asciimons. He also hints that not all Asciimons exist.
 
 # Writeup
 I (*foens*) attended *BSidesSF 2021 CTF* with the team *kalmarunionen*.
@@ -201,7 +201,7 @@ LAB_00403134:
 
 After the event ended, someone hinted that there was a `use-after-free` vulnerability.
 
-Each map contains a list of possible encounters, each being an Asciimon. When seeing a new Asciimon, you note it down. Thus, to `log` all Asciimons, we just have to meet them. When having faught and won over an Asciimon, you are asked if you whish to replace your current on with the one you just won over.
+Each map contains a list of possible encounters, each being an Asciimon. When seeing a new Asciimon, you note it down. Thus, to `log` all Asciimons, we just have to meet them. When having faught and won over an Asciimon, you are asked if you whish to replace your current one with the one you just won over.
 
 That seems all valid. However, if you exchange your Asciimon, then the one you just faught over **is still a valid encounter**! You can thus fight it **again** and this time the `free(own)` call will free the one you are now using. Thus, the `playerInfo->asciimon` now points to a free'd memory region.
 
@@ -544,6 +544,6 @@ The attack took ~18 mins to conduct. I have made a small video showing it, where
 
 Got the flag: `CTF{remember_cinnabar}`
 
-The performance of the attack could probably be increased. The game uses random numberse, but the seed is known. This could probably be used such that the script did not have to wait for responses, since they would already be known.
+The performance of the attack could probably be increased. The game uses random numbers, but the seed is known. This could probably be used such that the script did not have to wait for responses, since they would already be known.
 
 All in all, a very cool programmed game and a nice challenge. Kudos to *iagox86*!
