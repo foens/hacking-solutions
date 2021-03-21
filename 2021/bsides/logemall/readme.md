@@ -36,7 +36,7 @@ At the time I had already found the hidden commands:
 - `encounters show`. Shows the possible encounters for the current map.
 - `encounters hide`. Hides the encounters again.
 - `fly <arg>` with `<arg>` being one of: `jade`, `deepblue`, `scarlet`, `teal`, `colour`, `gray` or `orange`. Immediatly changes the map.
-- `fight` causes an encounter to happen immediatly with on of the possible encounters for the current map.
+- `fight` causes an encounter to happen immediatly with one of the possible encounters for the current map.
 
 I had looked into the logic of fighting, but had been focusing on buffer overflows. The vulnerability was something else: Look at my reverse engieneered code and see if you can find it:
 
@@ -277,7 +277,7 @@ void nameRater_00404472(PlayerInfo *playerIInfo)
 }
 ```
 
-Notice that the name is also malloc'ed with a size of `0x40`. The data is read using `fgets`, so we can also add `null` bytes. Great. We can thus go to the name rater and change your name, the name will be filled into the same area that the Asciimon had, we can now control the Asciimon definition.
+Notice that the name is also malloc'ed with a size of `0x40`. The data is read using `fgets`, so we can also add `null` bytes. Great. We can thus go to the name rater and change our name, the name will be filled into the same area that the Asciimon had, we can now control the Asciimon definition.
 
 I have reverse engineered the Asciimon struct to be:
 
@@ -297,12 +297,13 @@ struct Asciimon {
 Our deviced attack plan is then to:
 
 1. Go next to the name rater.
-2. Fight and exchange the same Asciimon on the map.
-3. Change the name through the name rater such that the ID of the asciimon is changed.
-4. Fight the now changed Asciimon
-5. Keep doing step 3 and 4 until all 152 Asciimons are logged!
+2. Fight and exchange some Asciimon.
+3. Fight the same Asciimon and exchange it again. We have triggered the `use-after-free` bug now.
+4. Change the name through the name rater such that the ID of the asciimon is changed.
+5. Start a fight with now changed Asciimon to log it. Just run away from it.
+6. Keep doing step 4 and 5 until all 152 Asciimons are logged!
 
-This was my first plan. However, it always failed when I reached the 10th Asciimon. I figured out that `0x10` is `\n` and `fgets` only reads until it reaches a newline. Hmm. I walked around in the game and found a map where it could be found in the wild. Thus, the plan is now to log all the other Asciimons using the trick above, but log the 10th Asciimon, the *Caterpillar*, in the wild.
+This was my first plan. However, it always failed when I reached the 10th Asciimon. I figured out that decimal `10` is `\n` and `fgets` only reads until it reaches a newline. Hmm. I walked around in the game and found a map where it could be found in the wild. Thus, the plan is now to log all the other Asciimons using the trick above, but log the 10th Asciimon, the *Caterpillar*, in the wild.
 
 This is what the attack does:
 
@@ -538,7 +539,7 @@ except KeyboardInterrupt:  # CTRL+C anytime to escape to interactive
 io.interactive()
 ```
 
-The attack took ~18 mins to conduct. I have made a small video showing it, where I have increased the playback speed of step 3 and 4 by a factor of `50`. I exchanged my Asciimon with a `Pitcher Plant`
+The attack took ~18 mins to conduct. I have made a small video showing it, where I have increased the playback speed of step 4 and 5 by a factor of `50`. I fought and exchanged my Asciimon with a `Pitcher Plant` twice to trigger the `use-after-free` vulnerability.
 
 ![solution](solution.gif)
 
