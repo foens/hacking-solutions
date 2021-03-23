@@ -16,6 +16,7 @@ Contains resources or solutions to various hacking challenges.
 * [Compiling GDB and GDBserver](guides/compile-gdb-and-gdbserver.md)
 * [Enabling core dumps](guides/enabling-core-dumps.md)
 * [Examine binary properties](guides/examining-binary-properties.md)
+* [Privilege escalation](guides/privilege-escalation.md)
 
 ## Challenges
 * CTF's
