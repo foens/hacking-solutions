@@ -1,0 +1,5 @@
+Just read the file.
+
+Yes, it says 'cat: password: Permission denied', but that is that actual password!
+
+I got cheated :/
